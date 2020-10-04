@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+	"libraries": [
+		{
+			"provider": "cdnjs",
+			"library": "vue@2.6.12",
+			"destination": "wwwroot/lib/vue/",
+			"files": [
+				"vue.min.js",
+				"vue.js"
+			]
+		},
+		{
+			"library": "moment.js@2.28.0",
+			"destination": "wwwroot/lib/moment.js/",
+			"files": [
+				"moment.min.js",
+				"moment.js"
+			]
+		},
+		{
+			"provider": "cdnjs",
+			"library": "vue-ls@3.2.1",
+			"destination": "wwwroot/lib/vue-ls/"
+		}
+	]
+}

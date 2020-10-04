@@ -1,0 +1,173 @@
+﻿@model CommentApp.Models.Post
+
+@{
+	ViewData["Title"] = "Details";
+}
+<a href="/post/index">
+	<i class="fas fa-arrow-left"></i>
+</a>
+
+<br />
+<div class="container" id="detail">
+	<div class="row activity">
+
+		<div class="col-md-6">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<img class="rounded-circle" width="45" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTG3eLpTAMWO-mtILepXLwg68-IChyGcXJgog&usqp=CAU" alt="">
+					<div class="pull-right text-right" style="color:black">
+						{{DetailsContent.createDate | moment}}
+					</div>
+					<div><strong>unknown</strong></div>
+				</div>
+				<br />
+				<div class="panel-body">
+					<h4>{{DetailsContent.name}}</h4>
+					<div v-if="DetailsContent.photo">
+						<img :src="'https://localhost:44304/img/'+DetailsContent.photo" class="img-fluid" alt="Responsive image" />
+					</div>
+
+					<br />
+					<div>
+						<span>{{TotalCmtCnt}}</span> <i class="fa fa-comment"></i> Comment
+					</div>
+
+					<div class="list-group-item" id="show">
+
+						<div class="input-group mb-3">
+							<input type="hidden" v-model="PostId">
+
+							<input type="text" class="form-control" placeholder="write comment" v-model="CommentDes" aria-label="Recipient's username" aria-describedby="basic-addon2">
+
+							<div class="input-group-append">
+								<button class="btn btn-primary" type="button" :disabled="DisabledBtnCmt" v-on:click="CommentAdd">Add Comment</button>
+							</div>
+						</div>
+						<hr />
+
+						<div v-if="!CommentList.length">
+							<div class="text-center">
+								<h5><span>No Comment</span></h5>
+							</div>
+						</div>
+
+
+						<div class="be-comment" v-for="CommentList in CommentList" :key="CommentList.id" v-else="CommentList">
+							<div class="be-img-comment">
+								<a>
+									<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTG3eLpTAMWO-mtILepXLwg68-IChyGcXJgog&usqp=CAU" alt="" class="be-ava-comment">
+								</a>
+							</div>
+							<div class="be-comment-content">
+								<span class="be-comment-name">
+									<a>unknown</a>
+								</span>
+								<span class="be-comment-time">
+									{{CommentList.createDate | moment}}
+								</span>
+								<h5 class="be-comment-text" style="background-color:lightcyan">
+									{{CommentList.commentDes}}
+								</h5>
+							</div>
+						</div>
+
+
+					</div>
+
+
+				</div>
+
+			</div>
+
+
+		</div>
+	</div>
+
+</div>
+
+
+
+<script>
+	var app = new Vue({
+		el: "#detail",
+		data() {
+			return {
+				PostId: "@Model.Id",
+				CommentDes: "",
+				CommentList: [],
+				DetailsContent:[]
+			};
+		},
+		computed: {
+			DisabledBtnCmt() {
+				let Disabled = true;
+				if (this.CommentDes == "") {
+					Disabled = true;
+				}
+				else {
+					Disabled = false;
+				}
+				return Disabled;
+			},
+
+			TotalCmtCnt() {
+				return this.CommentList.reduce((tot, item) => {
+					return tot + item.commentCount
+				}, 0)
+			},
+		},
+		methods: {
+			CommentAdd() {
+				var vm = this;
+				let formData = new FormData();
+				formData.append('CommentDes', this.CommentDes);
+				formData.append('PostId', this.PostId);
+				axios.post('/post/addcomment', formData).then(function () {
+					vm.detayComment();
+				})
+				this.CommentDes = "";
+			},
+			detayComment: function () {
+				var vm = this;
+				axios.get("/post/commentlist/" + this.PostId)
+					.then(function (response) {
+						vm.CommentList = response.data;
+					});
+
+			},
+			DetayContentMthd() {
+				var vm = this;
+				axios.get("/post/deta/" + this.PostId)
+					.then(function (response) {
+						vm.DetailsContent = response.data;
+					});
+			}
+
+		},
+		mounted() {
+			this.detayComment();
+			this.DetayContentMthd();
+		},
+		filters: {
+			moment: function (date) {
+				return moment(date).format('L');
+			}
+
+		},
+	});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
